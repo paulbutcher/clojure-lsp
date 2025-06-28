@@ -1,6 +1,7 @@
 ;; All available settings and its default values
 ;; Check the settings documentation section for more details of each one.
 {:source-paths #{"src" "test"} ;; auto-resolved for deps.edn, project.clj or bb.edn projects
+ :test-locations-regex #{"_test\\.clj[a-z]?$"} ;; Patterns matched with clojure.core/re-find
  :source-aliases #{:dev :test}
  :project-specs [] ;; Check the default at clojure-lsp.classpath/default-project-specs
  :source-paths-ignore-regex ["target.*"]
@@ -12,7 +13,12 @@
  :linters {:clj-kondo {:level :on
                        :report-duplicates true
                        :ns-exclude-regex ""}
-           :clj-depend {:level :info}} ;; Only if any clj-depend config is found
+           :clj-depend {:level :info} ;; Only if any clj-depend config is found
+           :clojure-lsp/unused-public-var {:level :info}
+           :clojure-lsp/different-aliases {:level :off}
+           :clojure-lsp/cyclic-dependencies {:level :error
+                                              :exclude-namespaces #{}}
+           :custom {}}
  :clean {:automatically-after-ns-refactor true
          :ns-inner-blocks-indentation :next-line
          :ns-import-classes-indentation :next-line
@@ -22,6 +28,7 @@
                 :import-classes {:classes-per-line 3} ;; -1 for all in single line
                 :refer {:max-line-length 80}}}
  :hover {:hide-file-location? false
+         :hide-signature-call? false
          :arity-on-same-line? false
          :clojuredocs true}
  :completion {:additional-edits-warning-text nil
@@ -52,10 +59,13 @@
  :show-docs-arity-on-same-line? false ; deprecated, will be removed soon, use :hover :arity-on-same-line?
  :lens-segregate-test-references true ; deprecated, will be removed soon, use :code-lens :segregate-test-references instead.
  :copy-kondo-configs? true
+ :kondo-config-dir nil ; defaults to <project-root-uri>/.clj-kondo
  :analysis {:keywords {:definitions true
                        :usages true}
             :java {:class-definitions true
                    :member-definitions true}
             :symbols true}
+ :otlp {:enabled false
+        :config {}} ;; map with properties to configure opentelemetry log via timbre.
  :cache-path ".lsp/.cache"
  :log-path "/tmp/clojure-lsp.*.out"}
